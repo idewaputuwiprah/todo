@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.Navigation
 import com.example.todo.ListTodoSealed
 import com.example.todo.R
@@ -12,11 +13,13 @@ import com.example.todo.databinding.FragmentTodoListBinding
 import com.example.todo.model.TodoCache
 import com.example.todo.presentation.main.MainViewModel
 import com.example.todo.utils.DialogUtils
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class TodoListFragment : Fragment() {
 
     private lateinit var mBinding: FragmentTodoListBinding
-    private lateinit var mainViewModel: MainViewModel
+    private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var mAdapterTodo: AdapterTodo
 
     override fun onCreateView(
@@ -24,7 +27,9 @@ class TodoListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        TODO("Buatlah viewBinding yang diperlukan oleh fragment")
+        mAdapterTodo = AdapterTodo()
+        mBinding = FragmentTodoListBinding.inflate(layoutInflater, container, false)
+        return mBinding.root
     }
 
 

@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todo.CreateTodoSealed
 import com.example.todo.ListTodoSealed
+import com.example.todo.RequestSealed
 import com.example.todo.domain.TodoService
 import com.example.todo.model.Todo
+import com.example.todo.model.TodoCache
 import com.example.todo.utils.DateUtils
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +19,8 @@ import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
-class MainViewModel(
+@HiltViewModel
+class MainViewModel @Inject constructor(
     private val todoService: TodoService,
     private val dateUtils: DateUtils
 ) : ViewModel() {
@@ -43,7 +46,14 @@ class MainViewModel(
     fun getTodoList() {
         mTodoCacheLiveData.value = ListTodoSealed.Progress
         viewModelScope.launch(Dispatchers.IO) {
-            todoService.getTodoList()
+            when (val request = todoService.getTodoList()) {
+                is RequestSealed.OnSuccess<*> -> {
+                    mTodoCacheLiveData.postValue(ListTodoSealed.OnSuccess(request.data as List<TodoCache>))
+                }
+                is RequestSealed.OnFailure -> {
+                    mTodoCacheLiveData.postValue(ListTodoSealed.OnFailure(request.err))
+                }
+            }
         }
     }
 

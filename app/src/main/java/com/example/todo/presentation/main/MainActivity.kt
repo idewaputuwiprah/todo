@@ -8,8 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.todo.R
+import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private var permissions = arrayOf(
