@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Todo</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="submit">Submit</string>
+    <string name="todo_list_is_empty">Todo list empty</string>
+    <string name="change_date">Change Date</string>
+    <string name="close">Close</string>
+    <string name="title_cannot_empty">Title cannot empty</string>
+    <string name="lat_lng_cannot_zero">Latitude and longitude cannot 0</string>
+    <string name="format_date_is_not_correct">Format date is wrong</string>
+</resources>
