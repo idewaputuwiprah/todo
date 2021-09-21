@@ -96,7 +96,7 @@
                 <androidx.appcompat.widget.AppCompatButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:onClick="@{(v) -> mainViewModel.getCalender(v)}"
+                    android:onClick="@{(view) -> mainViewModel.getCalender(view)}"
                     android:text="@string/change_date"
                     android:textAllCaps="false" />
 

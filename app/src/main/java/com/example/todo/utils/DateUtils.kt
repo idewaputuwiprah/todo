@@ -7,7 +7,6 @@ import java.util.*
 class DateUtils {
     companion object {
         const val FORMAT_DATE = "yyyy-MM-dd'T'HH:mm:SSS'Z'"
-//        const val FORMAT_DATE = "yyyy-MM-dd"
     }
 
     fun getCurrentDate(): String {

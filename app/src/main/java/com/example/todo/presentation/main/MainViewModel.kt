@@ -1,7 +1,10 @@
 package com.example.todo.presentation.main
 
 import android.content.Context
+import android.util.Log
 import android.view.View
+import android.widget.Toast
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +14,10 @@ import com.example.todo.RequestSealed
 import com.example.todo.domain.TodoService
 import com.example.todo.model.Todo
 import com.example.todo.model.TodoCache
+import com.example.todo.presentation.main.fragment.date.DatePickerFragment
+import com.example.todo.presentation.main.fragment.date.DatePickerListener
+import com.example.todo.presentation.main.fragment.date.TimePickerFragment
+import com.example.todo.presentation.main.fragment.date.TimePickerListener
 import com.example.todo.utils.DateUtils
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +31,8 @@ class MainViewModel @Inject constructor(
     private val todoService: TodoService,
     private val dateUtils: DateUtils
 ) : ViewModel() {
+
+    var supportFragmentManager: FragmentManager? = null
 
     private val mTodoCacheLiveData: MutableLiveData<ListTodoSealed> = MutableLiveData()
     val observerList get() = mTodoCacheLiveData
@@ -45,13 +54,15 @@ class MainViewModel @Inject constructor(
 
     fun getTodoList() {
         mTodoCacheLiveData.value = ListTodoSealed.Progress
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             when (val request = todoService.getTodoList()) {
                 is RequestSealed.OnSuccess<*> -> {
-                    mTodoCacheLiveData.postValue(ListTodoSealed.OnSuccess(request.data as List<TodoCache>))
+                    mTodoCacheLiveData.value = ListTodoSealed.OnSuccess(request.data as List<TodoCache>)
+//                    mTodoCacheLiveData.postValue(ListTodoSealed.OnSuccess(request.data as List<TodoCache>))
                 }
                 is RequestSealed.OnFailure -> {
-                    mTodoCacheLiveData.postValue(ListTodoSealed.OnFailure(request.err))
+                    mTodoCacheLiveData.value = ListTodoSealed.OnFailure(request.err)
+//                    mTodoCacheLiveData.postValue(ListTodoSealed.OnFailure(request.err))
                 }
             }
         }
@@ -76,25 +87,49 @@ class MainViewModel @Inject constructor(
 
     private fun saveTodo(todo: Todo) {
         mTodoState.value = CreateTodoSealed.OnProgressSave
-        TODO(
-            "Lakukan penyimpanan todo dan ketika perhasil melakukan penyimpanan," +
-                    "perbaharui data pada list"
-        )
+        todo.apply {
+            title = mTitleLiveData.value ?: ""
+            date = mDateLiveData.value ?: date
+            description = mDescriptionLiveData.value ?: ""
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val request = todoService.saveTodo(todo)) {
+                is RequestSealed.OnSuccess<*> -> {
+                    mTodoState.postValue(CreateTodoSealed.OnSaveSuccess)
+                }
+                is RequestSealed.OnFailure -> {
+                    Log.d("MainViewModel", request.err.toString())
+                }
+            }
+        }
     }
 
     fun getCalender(view: View) {
-        TODO(
-            "Panggil DatePickerDialog untuk medapatkan tahun, bulan, dan tanggal." +
-                    "kemudian lakukan pemanggilan method getHours()"
-        )
+        val datePicker = DatePickerFragment().also {
+            it.setListener(object : DatePickerListener {
+                override fun onDialogDateSet(year: Int, month: Int, dayOfMonth: Int) {
+                    getHours(year, month, dayOfMonth)
+                }
+            })
+        }
+        supportFragmentManager?.let {
+            datePicker.show(it, "datePicker")
+        }
     }
 
-    private fun getHours(context: Context, calendar: Calendar) {
-        TODO(
-            "Panggil TimePickerDialog untuk medapatkan jam dan menit." +
-                    "Kemudian update tampilan."
-        )
-
+    private fun getHours(year: Int, month: Int, dayOfMonth: Int) {
+        val timePicker = TimePickerFragment().also {
+            it.setListener(object : TimePickerListener {
+                override fun onDialogTimeSet(hourOfDay: Int, minute: Int) {
+                    val calendar = Calendar.getInstance()
+                    calendar.set(year, month, dayOfMonth, hourOfDay, minute)
+                    mDateLiveData.value = dateUtils.getDateWithFormatFromTimeMilis(calendar.timeInMillis)
+                }
+            })
+        }
+        supportFragmentManager?.let {
+            timePicker.show(it, "timePicker")
+        }
     }
 
     fun submit(todo: Todo) {

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todo.ListTodoSealed
 import com.example.todo.R
 import com.example.todo.databinding.FragmentTodoListBinding
@@ -37,6 +38,11 @@ class TodoListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         mainViewModel.getTodoList()
         mBinding.fragmentTodo = this
+        mBinding.rcvTodoList.apply {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = mAdapterTodo
+        }
         mainViewModel.observerList.observe(viewLifecycleOwner, {
             when (it) {
                 is ListTodoSealed.Progress -> mBinding.isOnProgress = true

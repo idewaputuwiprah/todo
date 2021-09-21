@@ -33,7 +33,6 @@ class GetListImpl(
                     listExpired.add(item)
                 else
                     result.add(item)
-                result.add(item)
             }
             if (listExpired.isNotEmpty())
                 result.addAll(listExpired)

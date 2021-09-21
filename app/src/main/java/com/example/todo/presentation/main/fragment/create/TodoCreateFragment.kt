@@ -13,6 +13,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.todo.CreateTodoSealed
 import com.example.todo.R
 import com.example.todo.databinding.FragmentCreateTodoBinding
+import com.example.todo.presentation.main.MainActivity
 import com.example.todo.presentation.main.MainViewModel
 import com.example.todo.utils.DialogUtils
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,7 +41,11 @@ class TodoCreateFragment : Fragment() {
 
             override fun longPressHelper(p: GeoPoint?): Boolean {
                 p?.let {
-                    changeMarkerLocation(p)
+                    mBinding.todo?.apply {
+                        latitude = it.latitude
+                        longitude = it.longitude
+                    }
+                    changeMarkerLocation(it)
                 }
                 return false
             }
@@ -54,11 +59,14 @@ class TodoCreateFragment : Fragment() {
     ): View {
         mTodoId = args.todoId
         mBinding = FragmentCreateTodoBinding.inflate(layoutInflater, container, false)
+        mBinding.lifecycleOwner = viewLifecycleOwner
+        mBinding.mainViewModel = mainViewModel
         return mBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        mainViewModel.supportFragmentManager = (activity as MainActivity).supportFragmentManager
         fragmentLiveDataState()
         registerLiveData()
         initMap()
@@ -71,8 +79,7 @@ class TodoCreateFragment : Fragment() {
             generateOverlay(geoPoint)
         })
         mainViewModel.observerDate.observe(viewLifecycleOwner, {
-            mBinding
-                .invalidateAll()
+            mBinding.invalidateAll()
         })
     }
 
