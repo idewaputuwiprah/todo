@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.navArgs
 import com.example.todo.CreateTodoSealed
 import com.example.todo.R
 import com.example.todo.databinding.FragmentCreateTodoBinding
@@ -23,6 +24,7 @@ class TodoCreateFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var mBinding: FragmentCreateTodoBinding
     private lateinit var mMaps: MapView
+    private val args: TodoCreateFragmentArgs by navArgs()
     private var mTodoId: Int? = null
 
     override fun onCreateView(
@@ -30,6 +32,7 @@ class TodoCreateFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        mTodoId = args.todoId
         mBinding = FragmentCreateTodoBinding.inflate(layoutInflater, container, false)
         return mBinding.root
     }
@@ -45,7 +48,7 @@ class TodoCreateFragment : Fragment() {
     private fun registerLiveData() {
         mainViewModel.observerLatLng.observe(viewLifecycleOwner, {
             val geoPoint = GeoPoint(it.latitude, it.longitude)
-            generateOverlay(geoPoint)
+//            generateOverlay(geoPoint)
         })
         mainViewModel.observerDate.observe(viewLifecycleOwner, {
             mBinding
@@ -103,5 +106,20 @@ class TodoCreateFragment : Fragment() {
 
     private fun getTodoById() {
         mainViewModel.getTodoById(mTodoId!!)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mMaps.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mMaps.onResume()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        mMaps.onDetach()
     }
 }

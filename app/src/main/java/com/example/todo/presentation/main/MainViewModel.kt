@@ -59,10 +59,19 @@ class MainViewModel @Inject constructor(
 
     fun getTodoById(id: Int) {
         mTodoState.value = CreateTodoSealed.OnProgressGet
-        TODO(
-            "Ketika object todo berhasil didapatkan," +
-                    "lakukan assign value ke masing-masing liveData yang disediakan"
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val request = todoService.getTodoById(id)) {
+                is RequestSealed.OnSuccess<*> -> {
+                    val data = request.data as Todo
+                    val coordinate = LatLng(data.latitude, data.longitude)
+                    mTodoState.postValue(CreateTodoSealed.OnGetSuccess(data))
+                    mTitleLiveData.postValue(data.title)
+                    mDescriptionLiveData.postValue(data.description)
+                    mDateLiveData.postValue(data.date)
+                    mLatLngLiveData.postValue(coordinate)
+                }
+            }
+        }
     }
 
     private fun saveTodo(todo: Todo) {

@@ -41,7 +41,7 @@ class AdapterTodo : RecyclerView.Adapter<AdapterTodo.ViewHolder>() {
         holder.setTodo(model)
         holder.itemView.setOnClickListener {
             val action =
-                TodoListFragmentDirections.actionTodoListFragmentToTodoCreateFragment(model.id!!)
+                TodoListFragmentDirections.actionTodoListFragmentToTodoCreateFragment(model.id)
             Navigation.findNavController(it).navigate(action)
         }
     }
