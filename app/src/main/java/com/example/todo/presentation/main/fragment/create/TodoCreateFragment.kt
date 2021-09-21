@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.Navigation
@@ -17,6 +19,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
 
 @AndroidEntryPoint
 class TodoCreateFragment : Fragment() {
@@ -26,6 +30,22 @@ class TodoCreateFragment : Fragment() {
     private lateinit var mMaps: MapView
     private val args: TodoCreateFragmentArgs by navArgs()
     private var mTodoId: Int? = null
+    private var currMarker: Marker? = null
+
+    private val eventsReceiver: MapEventsReceiver by lazy {
+        object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+                return true
+            }
+
+            override fun longPressHelper(p: GeoPoint?): Boolean {
+                p?.let {
+                    changeMarkerLocation(p)
+                }
+                return false
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,7 +68,7 @@ class TodoCreateFragment : Fragment() {
     private fun registerLiveData() {
         mainViewModel.observerLatLng.observe(viewLifecycleOwner, {
             val geoPoint = GeoPoint(it.latitude, it.longitude)
-//            generateOverlay(geoPoint)
+            generateOverlay(geoPoint)
         })
         mainViewModel.observerDate.observe(viewLifecycleOwner, {
             mBinding
@@ -64,19 +84,25 @@ class TodoCreateFragment : Fragment() {
     }
 
     private fun generateOverlay(geoPoint: GeoPoint) {
-        TODO(
-            "Buatlah marker untuk menampilkan koordinat todo pada maps," +
-                    "Marker yang tampil di maps hanya boleh satu"
-        )
+        currMarker = Marker(mMaps)
+        currMarker?.apply {
+            position = geoPoint
+            icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_location)
+            setAnchor(Marker.ANCHOR_BOTTOM, Marker.ANCHOR_CENTER)
+        }
+        mMaps.overlays.add(currMarker)
+        mMaps.overlays.add(MapEventsOverlay(eventsReceiver))
+        mMaps.invalidate()
     }
 
-    private val eventsReceiver: MapEventsReceiver by lazy {
-        TODO(
-            "Buatlah interaksi user dengan maap, ketika user melakukan longpress." +
-                    "Buatlah sebuah marker berdasarkan koordinat yang user tekan dan marker di maps hanya boleh satu"
-        )
+    private fun changeMarkerLocation(geoPoint: GeoPoint) {
+        mMaps.overlays.remove(currMarker)
+        currMarker?.apply {
+            position = geoPoint
+        }
+        mMaps.overlays.add(currMarker)
+        mMaps.invalidate()
     }
-
 
     private fun fragmentLiveDataState() {
         mainViewModel.observerSave.observe(viewLifecycleOwner, {
