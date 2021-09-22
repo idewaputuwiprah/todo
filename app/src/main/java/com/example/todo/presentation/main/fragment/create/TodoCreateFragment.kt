@@ -45,7 +45,7 @@ class TodoCreateFragment : Fragment() {
                         latitude = it.latitude
                         longitude = it.longitude
                     }
-                    changeMarkerLocation(it)
+                    generateOverlay(it)
                 }
                 return false
             }
@@ -91,6 +91,7 @@ class TodoCreateFragment : Fragment() {
     }
 
     private fun generateOverlay(geoPoint: GeoPoint) {
+        mMaps.overlays.remove(currMarker)
         currMarker = Marker(mMaps)
         currMarker?.apply {
             position = geoPoint
@@ -102,14 +103,14 @@ class TodoCreateFragment : Fragment() {
         mMaps.invalidate()
     }
 
-    private fun changeMarkerLocation(geoPoint: GeoPoint) {
-        mMaps.overlays.remove(currMarker)
-        currMarker?.apply {
-            position = geoPoint
-        }
-        mMaps.overlays.add(currMarker)
-        mMaps.invalidate()
-    }
+//    private fun changeMarkerLocation(geoPoint: GeoPoint) {
+//        mMaps.overlays.remove(currMarker)
+//        currMarker?.apply {
+//            position = geoPoint
+//        }
+//        mMaps.overlays.add(currMarker)
+//        mMaps.invalidate()
+//    }
 
     private fun fragmentLiveDataState() {
         mainViewModel.observerSave.observe(viewLifecycleOwner, {

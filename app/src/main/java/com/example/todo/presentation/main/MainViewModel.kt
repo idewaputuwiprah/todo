@@ -1,9 +1,6 @@
 package com.example.todo.presentation.main
 
-import android.content.Context
-import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -58,11 +55,9 @@ class MainViewModel @Inject constructor(
             when (val request = todoService.getTodoList()) {
                 is RequestSealed.OnSuccess<*> -> {
                     mTodoCacheLiveData.value = ListTodoSealed.OnSuccess(request.data as List<TodoCache>)
-//                    mTodoCacheLiveData.postValue(ListTodoSealed.OnSuccess(request.data as List<TodoCache>))
                 }
                 is RequestSealed.OnFailure -> {
                     mTodoCacheLiveData.value = ListTodoSealed.OnFailure(request.err)
-//                    mTodoCacheLiveData.postValue(ListTodoSealed.OnFailure(request.err))
                 }
             }
         }
@@ -98,7 +93,8 @@ class MainViewModel @Inject constructor(
                     mTodoState.postValue(CreateTodoSealed.OnSaveSuccess)
                 }
                 is RequestSealed.OnFailure -> {
-                    Log.d("MainViewModel", request.err.toString())
+//                    Log.d("MainViewModel", request.err.toString())
+                    mTodoState.postValue(CreateTodoSealed.OnFailure(request.err))
                 }
             }
         }
