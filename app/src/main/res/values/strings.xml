@@ -9,4 +9,5 @@
     <string name="title_cannot_empty">Title cannot empty</string>
     <string name="lat_lng_cannot_zero">Latitude and longitude cannot 0</string>
     <string name="format_date_is_not_correct">Format date is wrong</string>
+    <string name="add_new_todo">add new todo</string>
 </resources>

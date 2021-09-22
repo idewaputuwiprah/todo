@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.todo.R
 import com.example.todo.databinding.ItemTodoBinding
 import com.example.todo.model.TodoCache
-import javax.inject.Inject
 
 class AdapterTodo : RecyclerView.Adapter<AdapterTodo.ViewHolder>() {
     private val mItemList: MutableList<TodoCache> = ArrayList()

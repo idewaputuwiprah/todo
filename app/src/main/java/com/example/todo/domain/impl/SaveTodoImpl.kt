@@ -8,6 +8,8 @@ import com.example.todo.data.todo.TodoRepository
 import com.example.todo.domain.cases.SaveTodoUsesCase
 import com.example.todo.model.Todo
 import com.example.todo.utils.DateUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class SaveTodoImpl(
     private val dateUtils: DateUtils,
@@ -15,15 +17,16 @@ class SaveTodoImpl(
 ) : SaveTodoUsesCase {
 
 
-    override suspend fun invoke(todo: Todo): RequestSealed {
-        return try {
-            if (todo.title == "") throw StringEmptyException()
-            if (todo.latitude == 0.0 && todo.longitude == 0.0) throw LatLngException()
-            if (!dateUtils.checkFormatDate(todo.date)) throw DateFormatException()
-            val result = todoLocalRepository.saveTodo(todo)
-            RequestSealed.OnSuccess(result)
-        } catch (e: Throwable) {
-            RequestSealed.OnFailure(e)
+    override suspend fun invoke(todo: Todo): RequestSealed =
+        withContext(Dispatchers.IO) {
+            try {
+                if (todo.title == "") throw StringEmptyException()
+                if (todo.latitude == 0.0 && todo.longitude == 0.0) throw LatLngException()
+                if (!dateUtils.checkFormatDate(todo.date)) throw DateFormatException()
+                val result = todoLocalRepository.saveTodo(todo)
+                RequestSealed.OnSuccess(result)
+            } catch (e: Throwable) {
+                RequestSealed.OnFailure(e)
+            }
         }
-    }
 }

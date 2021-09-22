@@ -65,16 +65,16 @@ class MainViewModel @Inject constructor(
 
     fun getTodoById(id: Int) {
         mTodoState.value = CreateTodoSealed.OnProgressGet
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             when (val request = todoService.getTodoById(id)) {
                 is RequestSealed.OnSuccess<*> -> {
                     val data = request.data as Todo
                     val coordinate = LatLng(data.latitude, data.longitude)
-                    mTodoState.postValue(CreateTodoSealed.OnGetSuccess(data))
-                    mTitleLiveData.postValue(data.title)
-                    mDescriptionLiveData.postValue(data.description)
-                    mDateLiveData.postValue(data.date)
-                    mLatLngLiveData.postValue(coordinate)
+                    mTodoState.value = CreateTodoSealed.OnGetSuccess(data)
+                    mTitleLiveData.value = data.title
+                    mDescriptionLiveData.value =  data.description
+                    mDateLiveData.value = data.date
+                    mLatLngLiveData.value = coordinate
                 }
             }
         }
@@ -87,14 +87,13 @@ class MainViewModel @Inject constructor(
             date = mDateLiveData.value ?: date
             description = mDescriptionLiveData.value ?: ""
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             when (val request = todoService.saveTodo(todo)) {
                 is RequestSealed.OnSuccess<*> -> {
-                    mTodoState.postValue(CreateTodoSealed.OnSaveSuccess)
+                    mTodoState.value = CreateTodoSealed.OnSaveSuccess
                 }
                 is RequestSealed.OnFailure -> {
-//                    Log.d("MainViewModel", request.err.toString())
-                    mTodoState.postValue(CreateTodoSealed.OnFailure(request.err))
+                    mTodoState.value = CreateTodoSealed.OnFailure(request.err)
                 }
             }
         }

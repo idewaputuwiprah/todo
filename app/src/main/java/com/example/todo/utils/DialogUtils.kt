@@ -4,9 +4,6 @@ import android.app.Dialog
 import android.content.Context
 import android.nfc.FormatException
 import android.view.LayoutInflater
-import android.widget.Button
-import android.widget.TextView
-import androidx.core.content.ContextCompat
 import com.example.todo.LatLngException
 import com.example.todo.R
 import com.example.todo.StringEmptyException

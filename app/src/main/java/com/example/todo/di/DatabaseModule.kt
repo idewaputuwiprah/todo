@@ -22,7 +22,6 @@ class DatabaseModule {
             Database::class.java,
             "database.db"
         ).fallbackToDestructiveMigration()
-            .allowMainThreadQueries()
             .build()
     }
 
